@@ -1,1 +1,1 @@
-# BlazorServer
+# Comprehensive Blazor Server

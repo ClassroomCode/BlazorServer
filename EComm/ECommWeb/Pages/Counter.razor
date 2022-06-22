@@ -5,19 +5,33 @@
 <h1>Counter</h1>
 
 <p role="status">Current count: <span class="@BackgroundColor">@currentCount</span></p>
-
+<p>
+    <input type="number" @bind="@increment" @onkeypress="KeyHandler" @onkeypress:preventDefault />
+</p>
 <button class="btn btn-primary" disabled="@(currentCount >= 10)" @onclick="IncrementCount">Click me</button>
 
 @code {
     private int currentCount = 0;
+    private int increment = 1;
+
+    private void KeyHandler(KeyboardEventArgs e)
+    {
+        if (e.Key == "+")
+        {
+            increment++;
+        } else if (e.Key == "-")
+        {
+            increment--;
+        }
+    }
 
     private void IncrementCount(MouseEventArgs e)
     {
         if (e.CtrlKey) {
-            currentCount--;
+            currentCount -= increment;
         }
         else {
-            currentCount++;
+            currentCount += increment;
         }
     }
 

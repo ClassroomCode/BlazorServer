@@ -3,7 +3,8 @@
 <PageTitle>Weather forecast</PageTitle>
 
 @using ECommWeb.Data
-@inject WeatherForecastService ForecastService
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ECommContext> DbFactory
 
 <h1>Weather forecast</h1>
 
@@ -39,10 +40,11 @@ else
 }
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private Product[]? products;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        var context = await DbFactory.CreateDbContextAsync();
+        products = await context.Products.ToArrayAsync();
     }
 }

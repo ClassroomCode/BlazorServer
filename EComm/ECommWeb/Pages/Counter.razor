@@ -6,14 +6,19 @@
 
 <p role="status">Current count: <span class="@BackgroundColor">@currentCount</span></p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" disabled="@(currentCount >= 10)" @onclick="IncrementCount">Click me</button>
 
 @code {
     private int currentCount = 0;
 
-    private void IncrementCount()
+    private void IncrementCount(MouseEventArgs e)
     {
-        currentCount++;
+        if (e.CtrlKey) {
+            currentCount--;
+        }
+        else {
+            currentCount++;
+        }
     }
 
     private string BackgroundColor =>

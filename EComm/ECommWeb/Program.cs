@@ -11,7 +11,8 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
 builder.Services.AddDbContextFactory<ECommContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("ConnStr")));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("ConnStr"))
+    .LogTo(Console.WriteLine));
 
 var app = builder.Build();
 

@@ -45,7 +45,7 @@ else
         <div class="row mb-2">
             <label class="col-2" for="Package">Supplier:</label>
             <InputSelect class="col-6" id="Supplier" @bind-Value="product.SupplierId">
-                @foreach (var supplier in Suppliers!) {
+                @foreach (var supplier in Suppliers) {
                     <option value="@supplier.Id">@supplier.CompanyName</option>
                 }
             </InputSelect>
@@ -66,7 +66,7 @@ else
     private string currentStatus = "Loading...";
 
     private Product? product;
-    private Supplier[]? Suppliers;
+    private Supplier[] Suppliers = { }; 
 
     protected override async Task OnInitializedAsync()
     {
@@ -84,12 +84,24 @@ else
             currentStatus = "Product does not exist";
         }
         Suppliers = await (from s in context.Suppliers
-                     orderby s.CompanyName
-                     select s).ToArrayAsync();
+                           orderby s.CompanyName
+                           select s).ToArrayAsync();
     }
 
     private async Task SaveProduct()
     {
-        //
+        var context = await DbFactory.CreateDbContextAsync();
+        var existingProduct = await context.Products
+            .SingleOrDefaultAsync(p => p.Id == product.Id);
+
+        existingProduct.ProductName = product.ProductName;
+        existingProduct.UnitPrice = product.UnitPrice;
+        existingProduct.Package = product.Package;
+        existingProduct.SupplierId = product.SupplierId;
+        existingProduct.IsDiscontinued = product.IsDiscontinued;
+
+        await context.SaveChangesAsync();
+
+        // TODO
     }
 }

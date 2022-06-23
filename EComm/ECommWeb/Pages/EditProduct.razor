@@ -1,0 +1,33 @@
+﻿@page "/edit/{id}"
+
+@using ECommWeb.Data
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ECommContext> DbFactory
+
+<h3>Edit Product</h3>
+
+@if (product == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h3>@product.ProductName</h3>
+}
+
+@code {
+    [Parameter]
+    public string? id { get; set; }
+
+    private Product? product;
+
+    protected override async Task OnInitializedAsync()
+    {
+        int pid = int.Parse(id);
+
+        var context = await DbFactory.CreateDbContextAsync();
+        product = await context.Products
+        .Include(p => p.Supplier)
+        .SingleOrDefaultAsync(p => p.Id == pid);
+    }
+}

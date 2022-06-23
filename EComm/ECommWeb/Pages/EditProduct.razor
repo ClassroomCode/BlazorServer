@@ -44,13 +44,11 @@ else
         </div>
         <div class="row mb-2">
             <label class="col-2" for="Package">Supplier:</label>
-            @*
             <InputSelect class="col-6" id="Supplier" @bind-Value="product.SupplierId">
                 @foreach (var supplier in Suppliers!) {
                     <option value="@supplier.Id">@supplier.CompanyName</option>
                 }
             </InputSelect>
-            *@
         </div>
         <div class="row mb-2">
             <label class="col-2" for="IsDiscontinued">Inactive:</label>
@@ -68,6 +66,7 @@ else
     private string currentStatus = "Loading...";
 
     private Product? product;
+    private Supplier[]? Suppliers;
 
     protected override async Task OnInitializedAsync()
     {
@@ -84,6 +83,9 @@ else
         if (product == null) {
             currentStatus = "Product does not exist";
         }
+        Suppliers = await (from s in context.Suppliers
+                     orderby s.CompanyName
+                     select s).ToArrayAsync();
     }
 
     private async Task SaveProduct()

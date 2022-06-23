@@ -23,14 +23,14 @@ else
             <tr>
                 <th>Name</th>
                 <th>Package</th>
-                <th>Unit Price</th>
+                <th @onclick="SortByPrice">Unit Price</th>
                 <th>Supplier</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var product in products)
             {
-                <tr @onclick="() => EditProduct(product.Id)">
+                <tr class="row-hover" @onclick="() => EditProduct(product.Id)">
                     <td>@product.ProductName</td>
                     <td>@product.Package</td>
                     <td>@product.UnitPrice</td>
@@ -53,18 +53,23 @@ else
         .ToArrayAsync();
     }
 
+    private void SortByPrice()
+    {
+        if (products != null) {
+            products = products.OrderBy(p => p.UnitPrice).ToArray();
+        }
+
+        /*
+        var context = await DbFactory.CreateDbContextAsync();
+        products = await context.Products.OrderBy(p => p.UnitPrice)
+        .Include(p => p.Supplier)
+        .AsNoTracking()
+        .ToArrayAsync();
+        */
+    }
+
     private void EditProduct(int id)
     {
         NavManager.NavigateTo($"edit/{id}");
     }
 }
-
-
-
-@*
-
-1. EditProduct - Product does not exist
-2. EditProduct - Id value is invalid
-3. FetchData - Row hover (yellow) and hand icon
-
-*@

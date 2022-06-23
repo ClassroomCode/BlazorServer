@@ -8,6 +8,11 @@ h1:focus {
     outline: none;
 }
 
+.row-hover:hover {
+    background-color: yellow;
+    cursor: pointer;
+}
+
 a, .btn-link {
     color: #0071c1;
 }

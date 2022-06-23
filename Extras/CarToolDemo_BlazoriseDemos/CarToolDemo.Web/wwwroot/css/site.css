@@ -1,0 +1,13 @@
+
+.page-footer {
+  background-color: navy;
+  color: white;
+  font-size:0.9rem;
+  padding-top: 6px;
+  padding-bottom:12px
+}
+
+/* .list-group-item.active {
+  background-color: chocolate;
+  border-color: gray;
+} */

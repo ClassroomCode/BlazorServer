@@ -1,0 +1,49 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>Car Tool</PageTitle>
+
+<Layout>
+  <LayoutHeader>
+
+    <Bar Breakpoint="Breakpoint.Desktop" Background="Background.Dark" ThemeContrast="ThemeContrast.Dark">
+      <BarBrand>
+        Car Tool
+      </BarBrand>
+      <BarToggler />
+      <BarMenu>
+        <BarStart>
+          <BarItem>
+            <BarLink To="/">Home</BarLink>
+          </BarItem>
+          <BarItem>
+            <BarLink To="/counter">Counter</BarLink>
+          </BarItem>
+          <BarItem>
+            <BarLink To="/fetchdata">Fetch data</BarLink>
+          </BarItem>
+          <BarItem>
+            <BarLink To="/car-tool">Car tool</BarLink>
+          </BarItem>
+          <BarItem>
+            <BarLink To="/todo-tool">Todo tool</BarLink>
+          </BarItem>
+        </BarStart>
+      </BarMenu>
+    </Bar>
+  </LayoutHeader>
+  <LayoutContent Padding="Padding.Is2">
+    @Body
+  </LayoutContent>
+  <LayoutFooter>
+    <Div Flex="Flex.JustifyContent.Center"
+        Class="page-footer">
+      &copy; @(DateTime.Now.Year), A Cool Company, Inc.
+    </Div>
+  </LayoutFooter>
+</Layout>
+
+@code {
+
+
+
+}

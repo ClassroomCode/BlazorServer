@@ -1,0 +1,167 @@
+@page "/todo-tool"
+
+
+<ToolHeader HeaderText="Todo Tool" />
+
+<Row>
+  <Column ColumnSize="ColumnSize.Is6">
+    <ListGroup Mode="ListGroupMode.Selectable" @bind-SelectedItem="_selectedToDoId">
+    <Repeater Items="@_todos">
+      <ListGroupItem Name="@context.Id.ToString()">
+        <Row>
+          <Column ColumnSize="ColumnSize.Is11">
+            @context.Text
+          </Column>
+          <Column ColumnSize="ColumnSize.Is1">
+            @if (context.Done) {
+              @if (_selectedToDoId == context.Id.ToString()) {
+                <Icon Style="color: white" Name="IconName.Check" />
+              } else {
+                <Icon Style="color: green" Name="IconName.Check" />
+              }
+            }
+          </Column>
+        </Row>
+      </ListGroupItem>
+    </Repeater>
+    </ListGroup>
+  </Column>
+  <Column ColumnSize="ColumnSize.Is6">
+    @if (_selectedToDo is not null) {
+      <Card>
+        <CardBody>
+          <CardTitle>
+            <h3>Todo: @_selectedToDo?.Id</h3>
+          </CardTitle>
+          <CardText>
+            <Row>
+              <Column>
+                <Paragraph>@_selectedToDo?.Text</Paragraph>
+              </Column>
+            </Row>
+            <Row>
+              <Column>
+                @if (_selectedToDo?.Done ?? false) {
+                  <Button Color="Color.Primary" @onclick="markPending">
+                    Mark Pending
+                  </Button>
+                } else {
+                  <Button Color="Color.Primary" @onclick="markDone">
+                    Mark Done
+                  </Button>
+                }
+              </Column>
+            </Row>
+          </CardText>
+        </CardBody>
+      </Card>
+    } else {
+      <Card>
+        <CardBody>
+          <CardTitle>
+            <h3>New Todo</h3>
+          </CardTitle>
+          <CardText>
+            <Paragraph>Click a Todo to View Details</Paragraph>
+          </CardText>
+        </CardBody>
+      </Card>
+    }
+  </Column>
+</Row>
+
+<Card Margin="Margin.Is4.FromTop">
+  <CardBody Margin="Margin.Is2">
+    <Validations @ref="validations" Mode="ValidationMode.Auto" Model="@_todoForm" ValidateOnLoad="false">
+      <Row>
+        <Column ColumnSize="ColumnSize.Is8">
+          <Validation>
+              <Field Horizontal>
+                  <FieldLabel ColumnSize="ColumnSize.Is2">Todo</FieldLabel>
+                  <FieldBody ColumnSize="ColumnSize.Is10">
+                      <TextEdit Placeholder="To do..." @bind-Text="@_todoForm.Text" TValue="string">
+                          <Feedback>
+                              <ValidationError />
+                          </Feedback>
+                      </TextEdit>
+                  </FieldBody>
+              </Field>
+          </Validation>
+        </Column>
+        <Column ColumnSize="ColumnSize.Is4">
+          <Button Color="Color.Primary" Clicked="addToDo">Add Todo</Button>
+        </Column>
+      </Row>
+    </Validations>
+  </CardBody>
+</Card>
+
+@code {
+
+  Validations? validations = null;
+
+  private List<ToDo> _todos = new List<ToDo>() {
+    new () { Id = 1, Text = "Make dinner", Done = true },
+    new () { Id = 2, Text = "Do laundry", Done = false },
+    new () { Id = 3, Text = "Walk the dog", Done = false },
+  };
+
+  private string? _selectedToDoId = null;
+
+  private ToDoForm _todoForm = new();
+
+  private ToDo? _selectedToDo {
+    get {
+      if (_selectedToDoId is not null) {
+        int todoId = Convert.ToInt32(_selectedToDoId);
+        return _todos.Where(todo => todo.Id == todoId).SingleOrDefault();
+      } else {
+        return null;
+      }
+    }
+  }
+
+  private void markDone() {
+    if (_selectedToDo is not null) {
+      _selectedToDo.Done = true;
+    }
+
+  }
+
+  private void markPending() {
+    if (_selectedToDo is not null) {
+      _selectedToDo.Done = false;
+    }
+  }
+
+  private async Task addToDo() {
+
+    if (validations is not null) {
+      if ( await validations.ValidateAll() )
+      {
+        var newToDo = new ToDo() {
+          Id = _todos.Max(td => td.Id) + 1,
+          Text = _todoForm.Text ?? "",
+          Done = false,
+        };
+
+        _todos.Add(newToDo);
+
+        _todoForm.Text = "";
+      }
+    }
+
+  }
+
+  private class ToDo {
+    public int Id { get; set; } = -1;
+    public string Text { get; set;} = "";
+    public Boolean Done { get; set; } = false;
+  }
+
+  private class ToDoForm {
+    [Required]
+    public string Text { get; set; } = "";
+  }
+
+}

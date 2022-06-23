@@ -1,0 +1,140 @@
+﻿<DataGrid @ref="dataGrid" TItem="CarRow" Data="@CarRows" Editable="true" EditMode="DataGridEditMode.Inline"
+  RowInserted="@onCarInserted" RowUpdated="@onCarUpdated" RowRemoved="@onCarRemoved" UseInternalEditing="false">
+
+  <DataGridColumn TItem="CarRow" Field="Id" Caption="Id" Editable="false" />
+  <DataGridColumn TItem="CarRow" Field="Make" Caption="Make" Editable="true" />
+  <DataGridColumn TItem="CarRow" Field="Model" Caption="Model" Editable="true" />
+  <DataGridColumn TItem="CarRow" Field="Year" Caption="Year" Editable="true" />
+  <DataGridColumn TItem="CarRow" Field="Color" Caption="Color" Editable="true" />
+  <DataGridColumn TItem="CarRow" Field="Price" Caption="Price" Editable="true" />
+
+  <DataGridCommandColumn TItem="CarRow" />
+
+</DataGrid>
+
+<Modal @ref="_confirmDeleteModalRef">
+  <ModalContent Centered>
+    <ModalHeader>
+      <ModalTitle>Confirm Delete</ModalTitle>
+      <CloseButton />
+    </ModalHeader>
+    <ModalBody>
+      Are you sure you want to delete the car?
+    </ModalBody>
+    <ModalFooter>
+      <Button Color="Color.Secondary" Clicked="@CancelDelete">No</Button>
+      <Button Color="Color.Primary" Clicked="@PerformDelete">Yes</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+@code {
+
+  private int _deleteCarId = -1;
+
+  private Modal? _confirmDeleteModalRef = null;
+
+  [Parameter]
+  public IEnumerable<ICar> Cars { get; set; } = new List<ICar>();
+
+  [Parameter]
+  public EventCallback<INewCar> OnAddCar { get; set; }
+
+  [Parameter]
+  public EventCallback<ICar> OnSaveCar { get; set; }
+
+  [Parameter]
+  public EventCallback<int> OnDeleteCar { get; set; }
+
+  private DataGrid<CarRow>? dataGrid = null;
+
+  private IEnumerable<CarRow>? CarRows { get; set; } = new List<CarRow>();
+
+  protected override void OnParametersSet()
+  {
+    CarRows = Cars.Select(car => new CarRow
+    {
+      Id = car.Id,
+      Make = car.Make ?? "",
+      Model = car.Model ?? "",
+      Year = car.Year ?? 1900,
+      Color = car.Color ?? "",
+      Price = car.Price ?? 0,
+    }).ToList();
+  }
+
+  private async Task onCarInserted(SavedRowItem<CarRow, Dictionary<string, object>> e)
+  {
+    var insertedCar = new NewCar
+    {
+      Make = e.Values["Make"].ToString(),
+      Model = e.Values["Model"].ToString(),
+      Year = Convert.ToInt32(e.Values["Year"]),
+      Color = e.Values["Color"].ToString(),
+      Price = Convert.ToDecimal(e.Values["Price"])
+    };
+
+    await OnAddCar.InvokeAsync(insertedCar);
+
+    if (dataGrid is not null)
+    {
+      await dataGrid.Cancel();
+    }
+  }
+
+  private async Task onCarUpdated(SavedRowItem<CarRow, Dictionary<string, object>> e)
+  {
+    var updatedCar = new Car
+    {
+      Id = e.Item.Id,
+      Make = e.Values["Make"].ToString(),
+      Model = e.Values["Model"].ToString(),
+      Year = Convert.ToInt32(e.Values["Year"]),
+      Color = e.Values["Color"].ToString(),
+      Price = Convert.ToDecimal(e.Values["Price"])
+    };
+
+    await OnSaveCar.InvokeAsync(updatedCar);
+  }
+
+  private async Task onCarRemoved(CarRow car)
+  {
+    _deleteCarId = car.Id;
+
+    if (_confirmDeleteModalRef is not null)
+    {
+      await _confirmDeleteModalRef.Show();
+    }
+
+  }
+
+  private async Task CancelDelete()
+  {
+    if (_confirmDeleteModalRef is not null)
+    {
+      await _confirmDeleteModalRef.Hide();
+    }
+  }
+
+  private async Task PerformDelete()
+  {
+    await OnDeleteCar.InvokeAsync(_deleteCarId);
+
+    if (_confirmDeleteModalRef is not null)
+    {
+      await _confirmDeleteModalRef.Hide();
+    }
+  }
+
+
+  class CarRow
+  {
+    public int Id { get; set; }
+    public string Make { get; set; } = "";
+    public string Model { get; set; } = "";
+    public int Year { get; set; } = 1900;
+    public string Color { get; set; } = "";
+    public decimal Price { get; set; } = 0;
+  }
+
+}

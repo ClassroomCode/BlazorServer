@@ -12,40 +12,40 @@
 }
 else
 {
-    <EditForm Model="@product" OnValidSubmit="SaveProduct">
+   <EditForm Model="@product" OnValidSubmit="SaveProduct">
     <DataAnnotationsValidator />
     <fieldset>
         <div class="row mb-2">
             <label class="col-2" for="ProductName">Name:</label>
-            <InputText class="col-6" id="ProductName" @bind-Value="CurrentProduct.ProductName" />
+            <InputText class="col-6" id="ProductName" @bind-Value="product.ProductName" />
         </div>
         <div class="row mb-2">
             <div class="col-5 offset-2">
-                <ValidationMessage For="@(() => CurrentProduct.ProductName)" />
+                <ValidationMessage For="@(() => product.ProductName)" />
             </div>
         </div>
         <div class="row mb-2">
             <label class="col-2" for="UnitPrice">Unit Price:</label>
-            <InputNumber class="col-6" id="UnitPrice" @bind-Value="CurrentProduct.UnitPrice" />
+            <InputNumber class="col-6" id="UnitPrice" @bind-Value="product.UnitPrice" />
         </div>
         <div class="row mb-2">
             <div class="col-5 offset-2">
-                <ValidationMessage For="@(() => CurrentProduct.UnitPrice)" />
+                <ValidationMessage For="@(() => product.UnitPrice)" />
             </div>
         </div>
         <div class="row mb-2">
             <label class="col-2" for="Package">Package:</label>
-            <InputText class="col-6" id="Package" @bind-Value="CurrentProduct.Package" />
+            <InputText class="col-6" id="Package" @bind-Value="product.Package" />
         </div>
         <div class="row mb-2">
             <div class="col-5 offset-2">
-                <ValidationMessage For="@(() => CurrentProduct.Package)" />
+                <ValidationMessage For="@(() => product.Package)" />
             </div>
         </div>
         <div class="row mb-2">
             <label class="col-2" for="Package">Supplier:</label>
             @*
-            <InputSelect class="col-6" id="Supplier" @bind-Value="CurrentProduct.SupplierId">
+            <InputSelect class="col-6" id="Supplier" @bind-Value="product.SupplierId">
                 @foreach (var supplier in Suppliers!) {
                     <option value="@supplier.Id">@supplier.CompanyName</option>
                 }
@@ -54,7 +54,7 @@ else
         </div>
         <div class="row mb-2">
             <label class="col-2" for="IsDiscontinued">Inactive:</label>
-            <InputCheckbox class="col-6" id="Inactive" @bind-Value="CurrentProduct.IsDiscontinued" />
+            <InputCheckbox class="col-6" id="Inactive" @bind-Value="product.IsDiscontinued" />
         </div>
         <button class="btn btn-primary" type="submit">Save</button>
     </fieldset>
@@ -84,5 +84,10 @@ else
         if (product == null) {
             currentStatus = "Product does not exist";
         }
+    }
+
+    private async Task SaveProduct()
+    {
+        //
     }
 }

@@ -8,7 +8,7 @@
 
 @if (product == null)
 {
-    <p><em>Loading...</em></p>
+    <p><em>@currentStatus</em></p>
 }
 else
 {
@@ -19,15 +19,24 @@ else
     [Parameter]
     public string? id { get; set; }
 
+    private string currentStatus = "Loading...";
+
     private Product? product;
 
     protected override async Task OnInitializedAsync()
     {
-        int pid = int.Parse(id);
-
+        int pid;
+        if (!int.TryParse(id, out pid)) {
+            currentStatus = "Invalid Id";
+            return;
+        }
         var context = await DbFactory.CreateDbContextAsync();
         product = await context.Products
         .Include(p => p.Supplier)
         .SingleOrDefaultAsync(p => p.Id == pid);
+
+        if (product == null) {
+            currentStatus = "Product does not exist";
+        }
     }
 }

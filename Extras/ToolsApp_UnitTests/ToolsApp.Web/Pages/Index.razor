@@ -1,0 +1,12 @@
+@page "/"
+
+<h1>Hello, world!</h1>
+
+<p>Welcome @_displayName to your new app.</p>
+
+@code {
+
+  [CascadingParameter(Name = "DisplayName")]
+  private string _displayName { get; set; }
+
+}

@@ -1,0 +1,32 @@
+@page "/counter"
+
+@* the following comments are from the perspective of unit testing the
+"IncrementCount" event handler method *@
+
+@* when the button is clicked, the "currentCount" is incremented and the
+UI is updated, a unit test will not attempt to inspect the value of
+"currentCount" direct, "currentCount" is internal state of the component
+and the component should be viewed as a blackbox *@
+
+@* instead, a unit test will use the public "input" of clicking the button,
+then inspecting the UI update to see if correct number is outputted via the
+public "output" of the DOM tree *@
+
+@* one way, of seeing this change is through a snapshot test of the DOM tree,
+the initial rendering is snapshotted, then the button is clicked, and the new
+DOM is compared to the old DOM tree, the resulting diff can then be asserted *@
+
+<h1>Counter</h1>
+
+<p>Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}

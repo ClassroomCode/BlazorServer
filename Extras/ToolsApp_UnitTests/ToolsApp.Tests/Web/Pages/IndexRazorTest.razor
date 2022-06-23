@@ -1,0 +1,21 @@
+@inherits TestContext
+
+@code {
+
+  [Fact]
+  public void IndexCascade()
+  {
+    // just as component parameters can be passed into the component
+    // under test, it is also possible to setup cascading values
+    // to be used by the component under test
+    var cut = Render(
+      @<CascadingValue Name="DisplayName" Value=@("Test User")>
+        <ToolsApp.Web.Pages.Index />
+      </CascadingValue>
+    );
+
+    Assert.Equal(
+      "Welcome Test User to your new app.",
+      cut.Find("p").TextContent);
+  }
+}

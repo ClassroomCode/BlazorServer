@@ -1,0 +1,175 @@
+@inherits TestContext
+
+@using Moq
+
+@using ToolsApp.Core.Interfaces.Data
+@using ToolsApp.Core.Interfaces.Web
+@using ToolsApp.Web.Pages
+
+@code {
+
+  IColorsData _colorsDataMock;
+  IScreenBlocker _screenBlockerMock;
+
+  private void setupTest(bool confirmMockReturnValue) {
+
+    // mocking of an interface, makes mocking super easy
+    _colorsDataMock = Mock.Of<IColorsData>();
+    _screenBlockerMock = Mock.Of<IScreenBlocker>();
+
+    // coding services to an interface makes it very easy to register
+    // a mocked service
+    Services.AddSingleton<IColorsData>(_colorsDataMock);
+    Services.AddSingleton<IScreenBlocker>(_screenBlockerMock);
+
+    // These two components should not be rendered for real, but they are
+    // not really used in the unit test, so not implementation for testing
+    // is needed
+    ComponentFactories.AddStub<ToolHeader>();
+    ComponentFactories.AddStub<ColorForm>();
+    
+    // This component should not be rendered for real, but an implementation
+    // is needed because the only way to fire the "deleteColor" event handler
+    // in the Color Tool component is by firing event callback in the Color
+    // List
+    ComponentFactories.AddStub<ColorList>(parameters => {
+
+      var doDeleteColor = () => {
+        EventCallback<int> OnDeleteColor = parameters.Get(c => c.OnDeleteColor);
+        OnDeleteColor.InvokeAsync(1);
+      };
+
+      return @<button @onclick="doDeleteColor">Delete</button>;
+    });
+
+
+    // using the JSInterop emulator, a return value is specified to mock up
+    // the call to "window.confirm"
+    JSInterop.Setup<bool>("confirm", new object[] { 
+      "Are you sure you want to delete this color?"
+    }).SetResult(confirmMockReturnValue);
+
+  }
+
+  [Fact]
+  public void ColorFormDeleteButtonConfirmed()
+  {
+    // Arrange
+    setupTest(true);
+
+    // Act
+      
+    var cut = Render(
+      @<ColorTool />
+    );
+
+    // the rendered output of the Color List component will have a single
+    // button, that button needs to be found and clicked to trigger the
+    // invocation of the "deleteColor" event handler method
+    var buttonElement = cut.Find("button");
+    buttonElement.Click();
+
+    // Assert
+
+    // verify the stub components were called
+    Assert.True(cut.HasComponent<Stub<ToolHeader>>());
+    Assert.True(cut.HasComponent<Stub<ColorList>>());
+    Assert.True(cut.HasComponent<Stub<ColorForm>>());
+
+    // there was only one JSInterop invocation, so retrieve and assert it
+    var invocation = JSInterop.Invocations.FirstOrDefault();
+
+    Assert.Equal("InvokeAsync", invocation.InvocationMethodName);
+    Assert.Equal(
+      "confirm",
+      invocation.Identifier);
+    Assert.Equal(
+      "Are you sure you want to delete this color?",
+      invocation.Arguments[0]);
+
+    // need to wait for the timer expire which can be detected when the
+    // Unblock screen has been called twice (why twice?, read below)
+    cut.WaitForAssertion(() => Mock
+      .Get(_screenBlockerMock)
+      .Verify(
+        mock => mock.UnblockScreen(),
+        Times.Exactly(2)),
+        TimeSpan.FromSeconds(2000));      
+
+    Mock
+      .Get(_colorsDataMock)
+      .Verify(mock => mock.Remove(1), Times.Once());
+
+    // all invocations must be asserted, not just the called from the
+    // "deleteColor" event handler method (which is under test), but also
+    // initialization event handler such as after render
+    Mock
+      .Get(_colorsDataMock)
+      .Verify(mock => mock.All(), Times.Exactly(2));
+
+    Mock
+      .Get(_screenBlockerMock)
+      .Verify(mock => mock.BlockScreen(), Times.Exactly(2));
+
+  }
+
+  [Fact]
+  public void ColorFormDeleteButtonNotConfirmed()
+  {
+    // Arrange
+
+    setupTest(false);
+
+    JSInterop.Setup<bool>("confirm", new object[] { 
+      "Are you sure you want to delete this color?"
+    }).SetResult(false);
+
+    // Act
+      
+    var cut = Render(
+      @<ColorTool />
+    );
+
+    var buttonElement = cut.Find("button");
+    buttonElement.Click();
+
+    // Assert
+
+    Assert.True(cut.HasComponent<Stub<ToolHeader>>());
+    Assert.True(cut.HasComponent<Stub<ColorList>>());
+    Assert.True(cut.HasComponent<Stub<ColorForm>>());
+
+    var invocation = JSInterop.Invocations.FirstOrDefault();
+
+    Assert.Equal("InvokeAsync", invocation.InvocationMethodName);
+    Assert.Equal(
+      "confirm",
+      invocation.Identifier);
+    Assert.Equal(
+      "Are you sure you want to delete this color?",
+      invocation.Arguments[0]);
+
+
+    cut.WaitForAssertion(() => Mock
+      .Get(_screenBlockerMock)
+      .Verify(
+        mock => mock.UnblockScreen(),
+        Times.Exactly(1)),
+        TimeSpan.FromSeconds(2000));      
+
+
+    Mock
+      .Get(_colorsDataMock)
+      .Verify(mock => mock.Remove(1), Times.Never());
+
+    Mock
+      .Get(_colorsDataMock)
+      .Verify(mock => mock.All(), Times.Exactly(1));
+
+    Mock
+      .Get(_screenBlockerMock)
+      .Verify(mock => mock.BlockScreen(), Times.Exactly(1));
+
+  }
+
+}

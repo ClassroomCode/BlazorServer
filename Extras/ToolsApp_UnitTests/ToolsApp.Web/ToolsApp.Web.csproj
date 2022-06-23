@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\ToolsApp.Core\ToolsApp.Core.csproj" />
+    <ProjectReference Include="..\ToolsApp.Data\ToolsApp.Data.csproj" />
+    <ProjectReference Include="..\ToolsApp.Models\ToolsApp.Models.csproj" />
+    <ProjectReference Include="..\ToolsApp.Components\ToolsApp.Components.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+</Project>

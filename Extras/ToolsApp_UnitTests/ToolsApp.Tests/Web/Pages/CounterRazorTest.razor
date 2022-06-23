@@ -1,0 +1,35 @@
+@inherits TestContext
+
+@using ToolsApp.Web.Pages
+
+@code {
+
+  [Fact]
+  public void CounterSnapshot()
+  {
+
+    var cut = Render(
+      @<Counter />
+    );
+
+    // capture a DOM snapshot before the button is clicked
+    cut.SaveSnapshot();
+
+    // click the button incrementing the internal state variable and triggering
+    // a re-render
+    var buttonElement = cut.Find("button");
+    buttonElement.Click();
+
+    // get a new snapshot and compare to the previous, then assert the
+    // expected different
+    var changes = cut.GetChangesSinceSnapshot();
+
+    // if you merely assert the new value without doing a diff it is possible
+    // to miss other, possibly unexpected, changes to the dom tree
+    // asserting the differences will reveal other changes that have occurred
+    Assert.Single(changes);
+
+    changes.First()
+      .ShouldBeTextChange("Current count: 1");
+  }
+}

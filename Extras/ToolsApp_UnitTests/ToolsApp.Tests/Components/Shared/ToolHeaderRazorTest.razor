@@ -1,0 +1,33 @@
+@code {
+
+  // this unit test uses razor syntax, unit tests can be written as razor
+  // files or plain C# files
+
+  [Fact]
+  public void ToolHeaderComponentRendersCorrectly()
+  {
+    // Arrange
+
+    // the TestContext can be manually instantiated, but it can be
+    // inherited from as well
+    using var ctx = new TestContext();
+
+    // Act
+    // cut = component under test
+    var cut = ctx.Render(@<ToolHeader />);
+
+    // Assert
+    
+    // asserts the whole markup output of the component
+    // there are three strategies to assert dom output:
+    // - whole markup
+    // - inspecting specific elements
+    // - snapshot diffs
+    // all three approaches will be reviewed
+    cut.MarkupMatches(
+      @<header>
+        <h1>The Tool</h1>
+      </header>);
+  }
+
+}

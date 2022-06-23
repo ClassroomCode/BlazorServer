@@ -1,0 +1,77 @@
+@page "/color-tool"
+
+@* The comments below are from the perspective of unit testing
+the "deleteColor" event handler method. *@
+
+@using Core.Interfaces.Data
+@using Core.Interfaces.Models
+
+@* these two services that we have coded will need to be mocked *@
+@inject IColorsData colorsData
+@inject IScreenBlocker screenBlocker
+
+@* this service needs to mocked because cross the C# to JavaScript
+should not be done in a unit test, similar to how unit tests should
+read/write data to disk or over the network *@
+@* bUnit provides an emulator that enables spying and mocking *@
+@inject IJSRuntime JS
+
+@* none of the these components can be really be called, instead
+all of them will need stubs, and for ColorList, a mock implementation
+that fires off the "deleteColor" event handler will be used in the 
+unit test *@
+<ToolHeader HeaderText="Color Tool" />
+<ColorList Colors="@colors" OnDeleteColor="deleteColor" />
+<ColorForm ButtonText="Add Color" OnSubmitForm="addColor" />
+
+@code {
+
+  @* when unit testing, we should never attempt to interogate private
+  state nor try to invoke private methods, instead we will have to use
+  the available inputs and outputs to test internal functionality *@
+
+  private IEnumerable<IColor> colors = new List<IColor>();
+
+  protected async override Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender) {
+      await screenBlocker.BlockScreen();
+      colors = await colorsData.All();
+      @* added so we can see the screen blocker in action *@
+      await Task.Delay(1000); 
+      await screenBlocker.UnblockScreen();
+      StateHasChanged();
+    }
+  }
+
+  private async Task addColor(NewColor color) {
+    await screenBlocker.BlockScreen();  
+    await colorsData.Append(color);
+    colors = await colorsData.All();
+    @* added so we can see the screen blocker in action *@
+    await Task.Delay(1000);
+    await screenBlocker.UnblockScreen();
+}
+
+  private async Task deleteColor(int colorId) {
+    @* under test, the JS.InvokeAsync will be called on the emulator *@
+    @* we need to assert that the JS.InvokeAsync was called with the
+    specified arguments, and we need to mock the return value *@
+    @* two unit tests will be needed, one for when the confirm returns true,
+    and one for when the confirm returns false *@
+    if (await JS.InvokeAsync<bool>(
+      "confirm",
+      "Are you sure you want to delete this color?")) {
+
+      @* the following calls to the "screenBlocker" and "colorsData" 
+      services will need to be asserted; however, there is no mock data
+      that needs to be returned in this case *@
+      await screenBlocker.BlockScreen();  
+      await colorsData.Remove(colorId);
+      colors = await colorsData.All();
+      @* added so we can see the screen blocker in action *@
+      await Task.Delay(1000);
+      await screenBlocker.UnblockScreen();
+    }
+  }
+}

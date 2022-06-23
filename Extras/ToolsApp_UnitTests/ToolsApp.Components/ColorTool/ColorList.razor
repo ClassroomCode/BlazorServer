@@ -1,0 +1,26 @@
+@using ToolsApp.Core.Interfaces.Models
+
+<ul>
+  @foreach(var color in Colors) {
+    <li>
+      @color.Name @color.Hexcode
+
+      <button @onclick="@(() => doDeleteColor(color.Id))">X</button>
+    </li>
+  }
+</ul>
+
+@code {
+
+  [Parameter]
+  public IEnumerable<IColor> Colors { get; set; } = new List<Color>();
+
+  [Parameter]
+  public EventCallback<int> OnDeleteColor { get; set; }
+
+  private async Task doDeleteColor(int colorId)
+  {
+    await OnDeleteColor.InvokeAsync(colorId);
+  }
+
+}

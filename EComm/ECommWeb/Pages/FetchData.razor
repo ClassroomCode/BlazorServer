@@ -1,16 +1,16 @@
 ﻿@page "/fetchdata"
 
-<PageTitle>Weather forecast</PageTitle>
+<PageTitle>Products</PageTitle>
 
 @using ECommWeb.Data
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<ECommContext> DbFactory
 
-<h1>Weather forecast</h1>
+<h1>Products</h1>
 
 <p>This component demonstrates fetching data from a service.</p>
 
-@if (forecasts == null)
+@if (products == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -19,20 +19,20 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
+                <th>Name</th>
+                <th>Package</th>
+                <th>Unit Price</th>
+                <th>Supplier</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @foreach (var product in products)
             {
                 <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <td>@product.ProductName</td>
+                    <td>@product.Package</td>
+                    <td>@product.UnitPrice</td>
+                    <td>@product.SupplierId</td>
                 </tr>
             }
         </tbody>

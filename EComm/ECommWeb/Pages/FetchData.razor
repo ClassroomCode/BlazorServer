@@ -6,6 +6,7 @@
 @using Microsoft.EntityFrameworkCore
 @using System.Diagnostics
 @inject IDbContextFactory<ECommContext> DbFactory
+@inject NavigationManager NavManager
 
 <h1>Products</h1>
 
@@ -29,7 +30,7 @@ else
         <tbody>
             @foreach (var product in products)
             {
-                <tr>
+                <tr @onclick="() => EditProduct(product.Id)">
                     <td>@product.ProductName</td>
                     <td>@product.Package</td>
                     <td>@product.UnitPrice</td>
@@ -50,5 +51,10 @@ else
         .Include(p => p.Supplier)
         .AsNoTracking()
         .ToArrayAsync();
+    }
+
+    private void EditProduct(int id)
+    {
+        NavManager.NavigateTo($"edit/{id}");
     }
 }

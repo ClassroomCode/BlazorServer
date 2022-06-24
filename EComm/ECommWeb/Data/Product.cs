@@ -2,7 +2,7 @@
 
 namespace ECommWeb.Data;
 
-public class Product
+public class Product : IValidatableObject
 {
     public int Id { get; set; }
 
@@ -17,4 +17,16 @@ public class Product
 
     public int SupplierId { get; set; }
     public Supplier? Supplier { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        var retVal = new List<ValidationResult>();
+
+        if (ProductName.StartsWith("X"))
+        {
+            retVal.Add(new ValidationResult("Can't start with X", 
+                new string[1] { "ProductName" }));
+        }
+        return retVal;
+    }
 }

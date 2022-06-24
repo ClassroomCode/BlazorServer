@@ -57,11 +57,18 @@ else
         <button class="btn btn-primary" type="submit">Save</button>
     </fieldset>
 </EditForm>
+
+<Alert @bind-Show="ShowAlert">
+    <span class="oi oi-check mr-2" aria-hidden="true"></span>
+    <strong>Product saved</strong>
+</Alert>
 }
 
 @code {
     [Parameter]
     public string? id { get; set; }
+
+    private bool ShowAlert { get; set; } 
 
     private string currentStatus = "Loading...";
 
@@ -104,6 +111,6 @@ else
 
         await context.SaveChangesAsync();
 
-        // TODO
+        ShowAlert = true;
     }
 }

@@ -51,6 +51,8 @@ else
         .Include(p => p.Supplier)
         .AsNoTracking()
         .ToArrayAsync();
+
+        System.Diagnostics.Debug.WriteLine("**** INIT *****");
     }
 
     private void SortByPrice()

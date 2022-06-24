@@ -13,6 +13,7 @@
     public RenderFragment ChildContent { get; set; } = default!;
 
     private bool _show;
+    private Timer? _timer;
 
     [Parameter]
     public bool Show
@@ -24,7 +25,14 @@
                 _show = value;
                 ShowChanged?.InvokeAsync(_show);
 
-                // TODO: timer
+                if (value)
+                {
+                    _timer = new Timer(
+                        callback: _ => InvokeAsync(() => Dismiss()),
+                        state: null,
+                        dueTime: TimeSpan.FromSeconds(5),
+                        period: Timeout.InfiniteTimeSpan);
+                }
             }
         }
     }

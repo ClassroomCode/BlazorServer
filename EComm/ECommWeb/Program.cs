@@ -11,8 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddScoped<ProtectedSessionStorage>();
-builder.Services.AddScoped<AuthenticationStateProvider, MyAuthStateProvider>();
+//builder.Services.AddScoped<ProtectedBrowserStorage>();
+//builder.Services.AddScoped<AuthenticationStateProvider, MyAuthStateProvider>();
 builder.Services.AddSingleton<WeatherForecastService>();
 
 builder.Services.AddDbContextFactory<ECommContext>(opt =>

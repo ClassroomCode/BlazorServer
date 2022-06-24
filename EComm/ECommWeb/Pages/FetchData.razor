@@ -49,6 +49,7 @@ else
         var context = await DbFactory.CreateDbContextAsync();
         products = await context.Products
         .Include(p => p.Supplier)
+        //.Skip(20).Take(10)
         .AsNoTracking()
         .ToArrayAsync();
 

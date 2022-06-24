@@ -1,0 +1,16 @@
+﻿@using ECommWeb.Data
+
+<div class="row mb-2">
+    <label class="col-2" for="Supplier.CompanyName">Supplier Company:</label>
+    <InputText class="col-6" id="Supplier.CompanyName" @bind-Value="Supplier.CompanyName" />
+</div>
+<div class="row mb-2">
+    <div class="col-5 offset-2">
+        <ValidationMessage For="@(() => Supplier.CompanyName)" />
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Supplier? Supplier { get; set; }
+}
